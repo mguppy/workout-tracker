@@ -1,6 +1,25 @@
 const router = require("express").Router();
 const Workout = require("../models/Workout.js");
 
+// Get last workout with total duration summed
+router.get("/api/workouts", (req, res, next) => {
+    Workout.aggregate([
+        {
+        $addFields: {
+            totalDuration: {
+                $sum: '$exercises.duration',
+            },
+        },
+    },
+])
+    .then((dbWorkout) => {
+        res.json(dbWorkout);
+    })
+    .catch((err) => {
+        res.json(err);
+    });
+});
+
 // Add exercise to most recent workout plan
 router.put("/api/workouts/:id", ({body, params}, res) => {
     Workout.findByIdAndUpdate(
@@ -27,9 +46,7 @@ router.post("/api/workouts", (req, res) => {
       });
 });
 
-// Delete (find by ID)
-
-// Last seven workouts added to stats page
+// Last seven workouts added to stats page sorted by total duration
 router.get("/api/workouts/range", (req, res, next) => {
     Workout.aggregate([
         {
@@ -51,17 +68,19 @@ router.get("/api/workouts/range", (req, res, next) => {
 });
 
 
-// Adds all durations together; goes onto the stats page
-router.get("/api/workouts", (req, res, next) => {
+// Adds all weights together from past seven workouts; goes onto the stats
+router.get("/api/workouts/range", (req, res, next) => {
     Workout.aggregate([
         {
         $addFields: {
-            totalDuration: {
-                $sum: '$exercises.duration',
+            totalWeight: {
+                $sum: '$exercises.weight',
             },
         },
     },
 ])
+    .sort({_id: -1})
+    .limit(7)
     .then((dbWorkout) => {
         res.json(dbWorkout);
     })
