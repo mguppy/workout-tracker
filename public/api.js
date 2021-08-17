@@ -1,3 +1,4 @@
+// route to get last workout
 const API = {
   async getLastWorkout() {
     let res;
@@ -10,6 +11,7 @@ const API = {
 
     return json[json.length - 1];
   },
+  // route to add exercise to current workout plan
   async addExercise(data) {
     const id = location.search.split("=")[1];
 
@@ -23,6 +25,7 @@ const API = {
 
     return json;
   },
+  // route to add new workout plan
   async createWorkout(data = {}) {
     const res = await fetch("/api/workouts", {
       method: "POST",
@@ -35,6 +38,7 @@ const API = {
     return json;
   },
 
+  // route to see workouts during a date range
   async getWorkoutsInRange() {
     const res = await fetch(`/api/workouts/range`);
     const json = await res.json();

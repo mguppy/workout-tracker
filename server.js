@@ -1,6 +1,8 @@
 const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+const router = require("express").Router();
+const Workout = require("./models/Workout.js");
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,16 +27,26 @@ db.Fitness.create({ name: "Fitness Tracker" })
         console.log(message);
     })
 
-app.post("/workouts", ({ body }, res) => {
-    db.Workout.create(body)
-        .then(({ _id }) => db.Workout.findOneAndUpdate({}, { $push: { workouts: _id } }, { new: true }))
-        .then(dbWorkout => {
-            res.json(dbWorkout);
-        })
-        .catch(err => {
-            res.json(err);
-        });
-});
+// app.post("/workouts", ({ body }, res) => {
+//     db.Workout.create(body)
+//         .then(({ _id }) => db.Workout.findOneAndUpdate({}, { $push: { workouts: _id } }, { new: true }))
+//         .then(dbWorkout => {
+//             res.json(dbWorkout);
+//         })
+//         .catch(err => {
+//             res.json(err);
+//         });
+// });
+
+router.post("/api/workouts", ({ body }, res) => {
+    Workout.create(body)
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.status(400).json(err);
+      });
+  });
 
 app.listen(PORT, () => {
     console.log(`App running on port ${PORT}!`);
